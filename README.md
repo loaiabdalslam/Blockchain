@@ -1,2 +1,2 @@
-# Blockchain
-blockchain network v1.0
+# Simple Blockchain Network Concept
+  blockchain network v1.0
