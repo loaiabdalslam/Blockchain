@@ -1,5 +1,6 @@
 
 const block = require("./block.js");
+const transaction = require("./transaction.js");
 
 
 module.exports = class blockchain {
@@ -7,6 +8,9 @@ module.exports = class blockchain {
 
     this.chain=[this.createGensisBlock()]
     this.diffuclty=2
+    this.Penddingtransactions=[]
+    this.miningReward=100
+
     }
 
     createGensisBlock(){
@@ -18,36 +22,63 @@ module.exports = class blockchain {
     }
 
     addBlock(newBlock){
-        newBlock.previoushash=this.getlatestBlock().hash
-        //newBlock.hash=newBlock.calculateHash()
-        newBlock.minnedBlock(this.diffuclty)
-        this.chain.push(newBlock)
-        
-    }
-    isChain(){
-        // check if this block hash = pervious blockhash 
-        //check if this hash has same hash code of created hash
-        for(let i=1; i<this.chain.length; i++){
-            const currentBlock= this.chain[i]
-            const PerviousBlock= this.chain[i-1]
-
-            if(currentBlock.hash != currentBlock.calculateHash())
-                return false
-            if(currentBlock.previoushash != PerviousBlock.hash)
-                return false
+            newBlock.previoushash=this.getlatestBlock().hash
+            //newBlock.hash=newBlock.calculateHash()
+            newBlock.minnedBlock(this.diffuclty)
+            this.chain.push(newBlock)
             
     }
-        return true
+
+    isChain(){
+
+            for(let i=1; i<this.chain.length; i++){
+                const currentBlock= this.chain[i]
+                const PerviousBlock= this.chain[i-1]
+
+                if(currentBlock.hash != currentBlock.calculateHash())
+                    return false
+                if(currentBlock.previoushash != PerviousBlock.hash)
+                    return false
+                
+        }
+            return true
+    }
+
+    MinependdingTransaction(MiningRewardAdress){
+
+            const rewardTx = new transaction(null, MiningRewardAdress, this.miningReward)
+           
+            this.Penddingtransactions.push(rewardTx)
+
+            let NewBlock= new block(Date.now(),this.Penddingtransactions,this.getlatestBlock().hash)
+            NewBlock.minnedBlock(this.diffuclty)
+
+            console.log('NewBlock is Mined')
+
+            this.chain.push(NewBlock)
+
+            this.Penddingtransactions=[]
+
+
+    }
+
+        createTransaction(Transaction){
+            this.Penddingtransactions.push(Transaction)
+        }
+
+        getbalance(address){
+            let balance=0;
+            for(const block of this.chain){
+                for(const trans of block.transactions){
+                
+                        if(trans.fromAdress===address)
+                            balance-=trans.amount
+
+                        if(trans.ToAdress===address)
+                            balance+=trans.amount    
+                }
+            }
+            return balance;
+    }
 }
 
-
-}
-
-/*
-let ParophsCoin = new blockchain()
-ParophsCoin.addBlock(new block(1,"19-9-2018",{amout:4}))
-ParophsCoin.addBlock(new block(1,"19-9-2018",{amout:4}))
-
-console.log(JSON.stringify(ParophsCoin,null,4))
-
-*/
